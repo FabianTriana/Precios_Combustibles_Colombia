@@ -165,10 +165,37 @@ p {
 
 #statistics_section {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 30%;
+  align-items: center;
   border: 2px dotted blue;
 }
+
+.statistics_indicator_container {
+  display: flex;
+  justify-content: space-around;
+  width: 80%;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  background-color: white;
+  margin: 10px;
+  padding: 15px;
+}
+
+.statistics_indicator_info {
+  width: 60%;
+}
+
+.statistics_indicator_name {
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+.price_text {
+  font-size: 3.2rem;
+}
+
+.logo {
+  height: 40px;}
 
 #disclaimer_section {
   display: flex;
