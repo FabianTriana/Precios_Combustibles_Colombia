@@ -34,6 +34,9 @@ with urlopen('https://gist.githubusercontent.com/FabianTriana/ddcce8b1991536826c
 	geo = json.load(response)
 
 
+# Dictionary for logos:
+
+
 # App Layout:
 layout = html.Div(
 	[
@@ -47,7 +50,22 @@ layout = html.Div(
 	html.Div(
 		[
 		html.Div([dcc.Graph(id = 'the_map')], id = 'map_section'), 
-		html.Div(['This is the statistics section'], id = 'statistics_section')
+		html.Div(
+			[
+			html.Div(
+				[
+				html.Div(
+					[
+					html.Div('Máximo', className = 'statistics_indicator_name'), 
+					html.Div(id = 'max_price', className = 'price_text'), 
+					html.Div(id = 'max_trade_name')
+					], className = 'statistics_indicator_info'), 
+				html.Div(html.Img(id = 'max_logo', className = 'logo'))
+				], className = 'statistics_indicator_container'), 
+			html.Div('Mínimo', className = 'statistics_indicator_container'), 
+			html.Div('Mediana', className = 'statistics_indicator_container'), 
+			html.Div('Promedio', className = 'statistics_indicator_container')
+			], id = 'statistics_section')
 		], id = 'main_section'), 
 	html.Div(
 		[
@@ -57,7 +75,10 @@ layout = html.Div(
 
 
 # Callbacks:
-@app.callback([Output('the_map', 'figure')], 
+@app.callback([Output('the_map', 'figure'), 
+	Output('max_price', 'children'), 
+	Output('max_trade_name', 'children'), 
+	Output('max_logo', 'src')], 
 	[Input('department_dropdown', 'value'),
 	Input('city_dropdown', 'value'), 
 	Input('product_dropdown', 'value')])
@@ -92,6 +113,12 @@ def update_map(selected_departments, selected_cities, selected_products):
 	min_price = df_selected['price'].min()
 	max_price = df_selected['price'].max()
 
+	# Trade name:
+	max_trade_name = list(df_selected[df_selected['price'] == max_price]['trade_name'].unique())[0]
+
+	# Logos:
+	max_logo =  app.get_asset_url('logo_terpel.png')
+
 	# Figure:
 	fig = px.choropleth_mapbox(df_selected, 
 		geojson=geo, locations='assigned_code', 
@@ -105,4 +132,4 @@ def update_map(selected_departments, selected_cities, selected_products):
 		center = {'lat': 4.62, 'lon': -74.06},
 		labels={'price':'price'})
 	fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-	return [fig]
+	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo]
