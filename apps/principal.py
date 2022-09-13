@@ -62,7 +62,14 @@ layout = html.Div(
 					], className = 'statistics_indicator_info'), 
 				html.Div(html.Img(id = 'max_logo', className = 'logo'))
 				], className = 'statistics_indicator_container'), 
-			html.Div('Mínimo', className = 'statistics_indicator_container'), 
+			html.Div(
+				[html.Div(
+					[html.Div('Mínimo', className = 'statistics_indicator_name'), 
+					html.Div(id = 'min_price', className = 'price_text'), 
+					html.Div(id = 'min_trade_name')
+					], className = 'statistics_indicator_info'), 
+				html.Div(html.Img(id = 'min_logo', className = 'logo'))
+				], className = 'statistics_indicator_container'), 
 			html.Div('Mediana', className = 'statistics_indicator_container'), 
 			html.Div('Promedio', className = 'statistics_indicator_container')
 			], id = 'statistics_section')
@@ -78,7 +85,10 @@ layout = html.Div(
 @app.callback([Output('the_map', 'figure'), 
 	Output('max_price', 'children'), 
 	Output('max_trade_name', 'children'), 
-	Output('max_logo', 'src')], 
+	Output('max_logo', 'src'), 
+	Output('min_price', 'children'), 
+	Output('min_trade_name', 'children'), 
+	Output('min_logo', 'src')], 
 	[Input('department_dropdown', 'value'),
 	Input('city_dropdown', 'value'), 
 	Input('product_dropdown', 'value')])
@@ -110,14 +120,16 @@ def update_map(selected_departments, selected_cities, selected_products):
 	df_selected = df[(city_filter) & (department_filter) & (product_filter)]
 	
 	# Price Range:
-	min_price = df_selected['price'].min()
 	max_price = df_selected['price'].max()
+	min_price = df_selected['price'].min()
 
 	# Trade name:
 	max_trade_name = list(df_selected[df_selected['price'] == max_price]['trade_name'].unique())[0]
+	min_trade_name = list(df_selected[df_selected['price'] == min_price]['trade_name'].unique())[0]
 
 	# Logos:
-	max_logo =  app.get_asset_url('logo_terpel.png')
+	max_logo = app.get_asset_url('logo_texaco.png')
+	min_logo = app.get_asset_url('logo_terpel.png')
 
 	# Figure:
 	fig = px.choropleth_mapbox(df_selected, 
@@ -132,4 +144,4 @@ def update_map(selected_departments, selected_cities, selected_products):
 		center = {'lat': 4.62, 'lon': -74.06},
 		labels={'price':'price'})
 	fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo]
+	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo]
