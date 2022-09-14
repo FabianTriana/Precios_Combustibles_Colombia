@@ -70,8 +70,21 @@ layout = html.Div(
 					], className = 'statistics_indicator_info'), 
 				html.Div(html.Img(id = 'min_logo', className = 'logo'))
 				], className = 'statistics_indicator_container'), 
-			html.Div('Mediana', className = 'statistics_indicator_container'), 
-			html.Div('Promedio', className = 'statistics_indicator_container')
+			html.Div(
+				[html.Div(
+					[html.Div('Mediana', className = 'statistics_indicator_name'), 
+					html.Div(id = 'median_price', className = 'price_text'), 
+					html.Div(id = 'median_trade_name')
+					], className = 'statistics_indicator_info'), 
+				html.Div(html.Img(id = 'median_logo', className = 'logo'))
+				], className = 'statistics_indicator_container'), 
+			html.Div(
+				[html.Div(
+					[html.Div('Promedio', className = 'statistics_indicator_name'), 
+					html.Div(id = 'mean_price', className = 'price_text')
+					], className = 'statistics_indicator_info'), 
+				html.Div(html.Img(src = app.get_asset_url('fuel_black_logo.png'), className = 'logo'))
+				], className = 'statistics_indicator_container')
 			], id = 'statistics_section')
 		], id = 'main_section'), 
 	html.Div(
@@ -88,7 +101,11 @@ layout = html.Div(
 	Output('max_logo', 'src'), 
 	Output('min_price', 'children'), 
 	Output('min_trade_name', 'children'), 
-	Output('min_logo', 'src')], 
+	Output('min_logo', 'src'), 
+	Output('median_price', 'children'), 
+	Output('median_trade_name', 'children'), 
+	Output('median_logo', 'src'), 
+	Output('mean_price', 'children')], 
 	[Input('department_dropdown', 'value'),
 	Input('city_dropdown', 'value'), 
 	Input('product_dropdown', 'value')])
@@ -122,14 +139,18 @@ def update_map(selected_departments, selected_cities, selected_products):
 	# Price Range:
 	max_price = df_selected['price'].max()
 	min_price = df_selected['price'].min()
+	median_price = df_selected['price'].median()
+	mean_price = df_selected['price'].mean()
 
 	# Trade name:
 	max_trade_name = list(df_selected[df_selected['price'] == max_price]['trade_name'].unique())[0]
 	min_trade_name = list(df_selected[df_selected['price'] == min_price]['trade_name'].unique())[0]
+	median_trade_name = list(df_selected[df_selected['price'] == median_price]['trade_name'].unique()[0])
 
 	# Logos:
 	max_logo = app.get_asset_url('logo_texaco.png')
 	min_logo = app.get_asset_url('logo_terpel.png')
+	median_logo = app.get_asset_url('logo_petrobras.png')
 
 	# Figure:
 	fig = px.choropleth_mapbox(df_selected, 
@@ -144,4 +165,4 @@ def update_map(selected_departments, selected_cities, selected_products):
 		center = {'lat': 4.62, 'lon': -74.06},
 		labels={'price':'price'})
 	fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo]
+	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), median_trade_name, median_logo, '$'+str(int(mean_price))]
