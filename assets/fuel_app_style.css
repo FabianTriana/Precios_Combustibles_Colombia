@@ -156,12 +156,14 @@ p {
 #map_section {
   display: flex;
   width: 70%;
-  height: 500px;
+  height: 700px;
   border: 2px dotted red;
 }
 
 #the_map {
-  width: 100%;}
+  width: 100%;
+  height: 100%;
+}
 
 #statistics_section {
   display: flex;
@@ -255,4 +257,10 @@ p {
   #statistics_section {
     width: 100%;
     order: 1;
+  }
+
+  .statistics_indicator_container {
+    width: 100%;
+    margin-right: 0px;
+    margin-left: 0px;
   }
