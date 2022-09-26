@@ -11,6 +11,7 @@ import pandas as pd
 
 # Fuel Data:
 df = pd.read_csv("https://gist.githubusercontent.com/FabianTriana/ed6969797aa0f69fcd41f34e670eafed/raw/colombia_fuel_prices_2022_2q.csv", delimiter= ",")
+df['brand'] = df['brand'].str.strip()
 departments = sorted(list(df['department'].str.title().unique())+['Todos'])
 cities = sorted(list(df['municipality'].str.title().unique())+['Todas'])
 brands = sorted(list(df['brand'].str.title().unique())+['Todas'])
@@ -35,6 +36,13 @@ with urlopen('https://gist.githubusercontent.com/FabianTriana/ddcce8b1991536826c
 
 
 # Dictionary for logos:
+logos = {'BIOMAX': 'logo_biomax.png', 'BRIO': 'logo_brio.png', 
+'ECOS': 'logo_ecos.png', 'ESSO': 'logo_esso.png', 
+'MOBIL': 'logo_mobil.png', 'OCTANO': 'logo_octano.png', 
+'PETROBRAS': 'logo_petrobras.png', 'PETROMIL': 'logo_petromil.png', 
+'PLUS MAS': 'logo_plusmas.png', 'PUMA': 'logo_puma.png', 
+'TERPEL': 'logo_terpel.png', 'TEXACO': 'logo_texaco.png', 
+'ZEUSS': 'logo_zeuss.png'}
 
 
 # App Layout:
@@ -148,9 +156,23 @@ def update_map(selected_departments, selected_cities, selected_products):
 	median_trade_name = list(df_selected[df_selected['price'] == median_price]['trade_name'].unique()[0])
 
 	# Logos:
-	max_logo = app.get_asset_url('logo_texaco.png')
-	min_logo = app.get_asset_url('logo_terpel.png')
-	median_logo = app.get_asset_url('logo_petrobras.png')
+	max_brand = list(df_selected[df_selected['price'] == max_price]['brand'].unique())[0]
+	if max_brand in logos.keys():
+		max_logo = app.get_asset_url(logos[max_brand])
+	else:
+		max_logo = app.get_asset_url('fuel_black_logo.png')
+	
+	min_brand = list(df_selected[df_selected['price'] == min_price]['brand'].unique())[0]
+	if min_brand in logos.keys():
+		min_logo = app.get_asset_url(logos[min_brand])
+	else:
+		min_logo = app.get_asset_url('fuel_black_logo.png')
+
+	median_brand = list(df_selected[df_selected['price'] == median_price]['brand'].unique())[0]
+	if median_brand in logos.keys():
+		median_logo = app.get_asset_url(logos[median_brand])
+	else:
+		median_logo = app.get_asset_url('fuel_black_logo.png')
 
 	# Figure:
 	fig = px.choropleth_mapbox(df_selected, 
