@@ -1,6 +1,7 @@
 certifi==2019.6.16
 chardet==3.0.4
 Click
+cufflinks
 dash
 dash-bootstrap-components              
 dash-core-components
