@@ -103,7 +103,7 @@ layout = html.Div(
 
 
 # Callbacks:
-@app.callback([#Output('the_map', 'figure'), 
+@app.callback([Output('the_map', 'figure'), 
 	Output('max_price', 'children'), 
 	Output('max_trade_name', 'children'), 
 	Output('max_logo', 'src'), 
@@ -175,17 +175,16 @@ def update_map(selected_departments, selected_cities, selected_products):
 		median_logo = app.get_asset_url('fuel_black_logo.png')
 
 	# Figure:
-	#fig = px.choropleth_mapbox(df_selected, 
-	#	geojson=geo, locations='assigned_code', 
-	#	color='price', 
-	#	featureidkey = 'properties.assigned_code',
-	#	color_continuous_scale="RdYlGn_r",
-	#	range_color=(min_price, max_price),
-	#	mapbox_style="carto-positron",
-	#	zoom=7,
-	#	opacity=0.5,
-	#	center = {'lat': 4.62, 'lon': -74.06},
-	#	labels={'price':'price'})
-	#fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-	#return [fig, 
-	return ['$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), median_trade_name, median_logo, '$'+str(int(mean_price))]
+	fig = px.choropleth_mapbox(df_selected, 
+		geojson=geo, locations='assigned_code', 
+		color='price', 
+		featureidkey = 'properties.assigned_code',
+		color_continuous_scale="RdYlGn_r",
+		range_color=(min_price, max_price),
+		mapbox_style="carto-positron",
+		zoom=7,
+		opacity=0.5,
+		center = {'lat': 4.62, 'lon': -74.06},
+		labels={'price':'price'})
+	fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), median_trade_name, median_logo, '$'+str(int(mean_price))]
