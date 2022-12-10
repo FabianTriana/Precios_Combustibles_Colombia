@@ -31,8 +31,8 @@ for product in df['product'].unique():
 	products_dict[product.title()] = product
 
 # Geographic Data:
-#with urlopen('https://gist.githubusercontent.com/FabianTriana/ddcce8b1991536826cd8ef1126c28e7a/raw/077e1b21767f9e29bcf36fc8be35bd40b1659b53/colombia_municipalities_assigned_code.json') as response:
-#	geo = json.load(response)
+with urlopen('https://gist.githubusercontent.com/FabianTriana/ddcce8b1991536826cd8ef1126c28e7a/raw/077e1b21767f9e29bcf36fc8be35bd40b1659b53/colombia_municipalities_assigned_code.json') as response:
+	geo = json.load(response)
 
 
 # Dictionary for logos:
