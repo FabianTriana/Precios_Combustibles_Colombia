@@ -188,4 +188,4 @@ def update_map(selected_departments, selected_cities, selected_products):
 	#	labels={'price':'price'})
 	#fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
 	#return [fig, 
-	return '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), median_trade_name, median_logo, '$'+str(int(mean_price))]
+	return ['$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), median_trade_name, median_logo, '$'+str(int(mean_price))]
