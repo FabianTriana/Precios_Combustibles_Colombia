@@ -30,6 +30,10 @@ products_dict = {'Todos': 'Todos'}
 for product in df['product'].unique():
 	products_dict[product.title()] = product
 
+brands_dict = {'Todas': 'Todas'}
+for brand in df['brand'].unique():
+	brands_dict[brand.title()] = brand
+
 # Geographic Data:
 with urlopen('https://gist.githubusercontent.com/FabianTriana/ddcce8b1991536826cd8ef1126c28e7a/raw/077e1b21767f9e29bcf36fc8be35bd40b1659b53/colombia_municipalities_assigned_code.json') as response:
 	geo = json.load(response)
@@ -52,7 +56,7 @@ layout = html.Div(
 		[
 		html.Div([html.Div('Departamento', className = 'filter_title'), dcc.Dropdown(options=[{"label": i, "value": departments_dict[i]} for i in departments], value = ['CUNDINAMARCA'], multi = True, id = 'department_dropdown')], className = 'filter'), 
 		html.Div([html.Div('Ciudad', className = 'filter_title'), dcc.Dropdown(options=[{"label": i, "value": cities_dict[i]} for i in cities], value = ['Todas'], multi = True, id = 'city_dropdown')], className = 'filter'), 
-		html.Div([html.Div('Marca', className = 'filter_title'), dcc.Dropdown(options=[{"label": i, "value": i} for i in brands], value = ['Todas'], multi = True, id = 'brand_dropdown')], className = 'filter'), 
+		html.Div([html.Div('Marca', className = 'filter_title'), dcc.Dropdown(options=[{"label": i, "value": brands_dict[i]} for i in brands], value = ['Todas'], multi = True, id = 'brand_dropdown')], className = 'filter'), 
 		html.Div([html.Div('Producto', className = 'filter_title'), dcc.Dropdown(options=[{"label": i, "value": products_dict[i]} for i in products], value = ['GASOLINA CORRIENTE'], multi = True, id = 'product_dropdown')], className = 'filter')
 		], id = 'filter_section'), 
 	html.Div(
@@ -82,9 +86,8 @@ layout = html.Div(
 				[html.Div(
 					[html.Div('Mediana', className = 'statistics_indicator_name'), 
 					html.Div(id = 'median_price', className = 'price_text'), 
-					html.Div(id = 'median_trade_name')
 					], className = 'statistics_indicator_info'), 
-				html.Div(html.Img(id = 'median_logo', className = 'logo'))
+				html.Div(html.Img(src = app.get_asset_url('fuel_black_logo.png'), className = 'logo'))
 				], className = 'statistics_indicator_container'), 
 			html.Div(
 				[html.Div(
@@ -110,14 +113,13 @@ layout = html.Div(
 	Output('min_price', 'children'), 
 	Output('min_trade_name', 'children'), 
 	Output('min_logo', 'src'), 
-	Output('median_price', 'children'), 
-	Output('median_trade_name', 'children'), 
-	Output('median_logo', 'src'), 
+	Output('median_price', 'children'),
 	Output('mean_price', 'children')], 
 	[Input('department_dropdown', 'value'),
 	Input('city_dropdown', 'value'), 
-	Input('product_dropdown', 'value')])
-def update_map(selected_departments, selected_cities, selected_products):
+	Input('product_dropdown', 'value'), 
+	Input('brand_dropdown', 'value')])
+def update_map(selected_departments, selected_cities, selected_products, selected_brands):
 	# Department Selection:
 	if 'Todos' in selected_departments:
 		selected_departments = list(df['department'].unique())
@@ -135,14 +137,21 @@ def update_map(selected_departments, selected_cities, selected_products):
 		selected_products = list(df['product'].unique())
 	else:
 		selected_products = selected_products
+
+	# Brands Selection:
+	if 'Todas' in selected_brands:
+		selected_brands = list(df['brand'].unique())
+	else:
+		selected_brands = selected_brands
 	
 	# Conditions to filter Dataframe:
 	city_filter = df['municipality'].isin(selected_cities)
 	department_filter = df['department'].isin(selected_departments)
 	product_filter = df['product'].isin(selected_products)
+	brand_filter = df['brand'].isin(selected_brands)
 
 	# Dataframe:
-	df_selected = df[(city_filter) & (department_filter) & (product_filter)]
+	df_selected = df[(city_filter) & (department_filter) & (product_filter) & (brand_filter)]
 	
 	# Price Range:
 	max_price = df_selected['price'].max()
@@ -153,7 +162,6 @@ def update_map(selected_departments, selected_cities, selected_products):
 	# Trade name:
 	max_trade_name = list(df_selected[df_selected['price'] == max_price]['trade_name'].unique())[0]
 	min_trade_name = list(df_selected[df_selected['price'] == min_price]['trade_name'].unique())[0]
-	median_trade_name = list(df_selected[df_selected['price'] == median_price]['trade_name'].unique()[0])
 
 	# Logos:
 	max_brand = list(df_selected[df_selected['price'] == max_price]['brand'].unique())[0]
@@ -168,12 +176,6 @@ def update_map(selected_departments, selected_cities, selected_products):
 	else:
 		min_logo = app.get_asset_url('fuel_black_logo.png')
 
-	median_brand = list(df_selected[df_selected['price'] == median_price]['brand'].unique())[0]
-	if median_brand in logos.keys():
-		median_logo = app.get_asset_url(logos[median_brand])
-	else:
-		median_logo = app.get_asset_url('fuel_black_logo.png')
-
 	# Figure:
 	fig = px.choropleth_mapbox(df_selected, 
 		geojson=geo, locations='assigned_code', 
@@ -187,4 +189,4 @@ def update_map(selected_departments, selected_cities, selected_products):
 		center = {'lat': 4.62, 'lon': -74.06},
 		labels={'price':'price'})
 	fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), median_trade_name, median_logo, '$'+str(int(mean_price))]
+	return [fig, '$'+str(int(max_price)), max_trade_name, max_logo, '$'+str(int(min_price)), min_trade_name, min_logo, '$'+str(int(median_price)), '$'+str(int(mean_price))]
